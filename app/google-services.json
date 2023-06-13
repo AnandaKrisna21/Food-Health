@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "368263910762",
+    "project_id": "login-signup-627ff",
+    "storage_bucket": "login-signup-627ff.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:368263910762:android:6c84db40df47fc4feb8113",
+        "android_client_info": {
+          "package_name": "com.example.foodhealth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "368263910762-nue0tn0cen11dp5okvek78dffjfgb301.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApPWq6gcBTXTmwQeTU0Ctl8OnVInOTGng"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "368263910762-nue0tn0cen11dp5okvek78dffjfgb301.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
