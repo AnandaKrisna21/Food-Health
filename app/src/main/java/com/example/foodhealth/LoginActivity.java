@@ -16,20 +16,25 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText edt_email,edt_pass;
+    EditText edt_phone,edt_pass;
     Button btn_login;
     TextView txt_sign;
-    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://login-signup-7b7c9-default-rtdb.firebaseio.com");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-         edt_email = findViewById(R.id.et_email);
+         edt_phone = findViewById(R.id.et_phone);
          edt_pass = findViewById(R.id.et_pass);
          btn_login = findViewById(R.id.bt_login);
          txt_sign = findViewById(R.id.txt_signup);
@@ -46,34 +51,49 @@ public class LoginActivity extends AppCompatActivity {
          btn_login.setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View view) {
-                 String email, password;
-                 email = String.valueOf(edt_email.getText());
+                 String phone, password;
+                 phone = String.valueOf(edt_phone.getText());
                  password = String.valueOf(edt_pass.getText());
 
-                 if (TextUtils.isEmpty(email)){
-                     Toast.makeText(LoginActivity.this, "Enter Email", Toast.LENGTH_SHORT).show();
-                     return;
-                 }
-                 if (TextUtils.isEmpty(password)){
-                     Toast.makeText(LoginActivity.this, "Enter Password", Toast.LENGTH_SHORT).show();
-                     return;
-                 }
+                 if (phone.isEmpty() || password.isEmpty()){
+                     Toast.makeText(LoginActivity.this, "Please input your phone and password", Toast.LENGTH_SHORT).show();
+                 } else {
+                     databaseReference.child("user").addListenerForSingleValueEvent(new ValueEventListener() {
+                         @Override
+                         public void onDataChange(@NonNull DataSnapshot snapshot) {
+                             if (snapshot.hasChild(phone)){
+                                 String getPasword = snapshot.child(phone).child("password").getValue(String.class);
 
-                 firebaseAuth.signInWithEmailAndPassword(email,password)
-                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                             @Override
-                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                 if (task.isSuccessful()) {
-                                     Toast.makeText(LoginActivity.this, "Login Succesfull", Toast.LENGTH_SHORT).show();
-                                     Intent a = new Intent(LoginActivity.this, HomeActivity.class);
-                                     startActivity(a);
+                                 if (getPasword.equals(password)){
+                                     String user = snapshot.child(phone).child("fullname").getValue(String.class);
+                                     String date = snapshot.child(phone).child("date").getValue(String.class);
+                                     String email = snapshot.child(phone).child("email").getValue(String.class);
+
+                                     Intent intent = new Intent(getApplicationContext(), ProfileActivity.class);
+                                     intent.putExtra("fullname", user);
+                                     intent.putExtra("date", date);
+                                     intent.putExtra("phone", phone);
+                                     intent.putExtra("email", email);
+                                     intent.putExtra("password", password);
+                                     startActivity(intent);
+
+                                     Toast.makeText(LoginActivity.this, "Login Succesfully", Toast.LENGTH_SHORT).show();
+                                     startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                                      finish();
+                                 }  else {
+                                     Toast.makeText(LoginActivity.this, "Password Invalid", Toast.LENGTH_SHORT).show();
                                  }
-                                 else {
-                                     Toast.makeText(LoginActivity.this, "Authentication Failed", Toast.LENGTH_SHORT).show();
-                                 }
+                             } else {
+                                 Toast.makeText(LoginActivity.this, "Check Your Phone and Password", Toast.LENGTH_SHORT).show();
                              }
-                         });
+                         }
+
+                         @Override
+                         public void onCancelled(@NonNull DatabaseError error) {
+
+                         }
+                     });
+                 }
              }
          });
     }
